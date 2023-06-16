@@ -1,86 +1,63 @@
-﻿using System.Diagnostics;
-using System.Management;
+﻿using Microsoft.Win32;
+using NvAPIWrapper;
+using NvAPIWrapper.GPU;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+using System.Text.RegularExpressions;
 
 namespace NvidiaUpdate
 {
-    public partial class Form1 : Form
+    public partial class FormMain : Form
     {
-        public Form1()
+        public FormMain()
         {
             InitializeComponent();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            label1.Text = GetDiscreteGraphicsCardModel();
-            label2.Text = GetNvidiaDriverVersion();
+            Query query = new();
+
+            label1.Text = $"Product type: {query.ProductType}";
+            label2.Text = $"Product series: {query.ProductSeries}";
+            label3.Text = $"Product: {query.Product}";
+            label4.Text = $"Operating System: {query.OperatingSystem}";
+            label5.Text = $"Download type: {query.DownloadType}";
+            label6.Text = $"Language: {query.Language}";
         }
 
-        private string GetDiscreteGraphicsCardModel()
+        private void button1_Click(object sender, EventArgs e)
         {
-            try
-            {
-                using (ManagementObjectSearcher searcher = 
-                    new ManagementObjectSearcher("SELECT * FROM Win32_VideoController WHERE AdapterCompatibility LIKE '%NVIDIA%'"))
-                {
-                    foreach (ManagementObject obj in searcher.Get())
-                    {
-                        string model = obj["Name"].ToString();
-                        return $"GPU model: {model}";
-                    }
-                }
-            }
-            catch (ManagementException ex)
-            {
-                MessageBox.Show("Error: " + ex.Message, "Management Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            Query query = new Query();
 
-            return string.Empty;
+            IWebDriver driver = new ChromeDriver();
+
+            driver.Navigate().GoToUrl("https://www.nvidia.com/Download/index.aspx?lang=en-us");
+
+            SelectComboBox(driver, "selProductSeriesType", $"{query.ProductType}");
+            SelectComboBox(driver, "selProductSeries", $"{query.ProductSeries}");
+            SelectComboBox(driver, "selProductFamily", $"{query.Product}");
+            SelectComboBox(driver, "selOperatingSystem", $"{query.OperatingSystem}");
+            SelectComboBox(driver, "ddlDownloadTypeCrdGrd", $"{query.DownloadType}");
+            SelectComboBox(driver, "ddlLanguage", $"{query.Language}");
+
+            IWebElement searchButton = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
+            searchButton.Click();
+
+            IWebElement download1Button = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
+            download1Button.Click();
+
+            IWebElement download2Button = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
+            download2Button.Click();
         }
 
-        private string GetNvidiaDriverVersion()
+        static void SelectComboBox(IWebDriver driver, string comboBoxName, string optionText)
         {
-            try
-            {
-                ProcessStartInfo processStartInfo = new ProcessStartInfo("nvidia-smi")
-                {
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
+            IWebElement comboBox = driver.FindElement(By.Name(comboBoxName));
 
-                using (Process process = new Process { StartInfo = processStartInfo })
-                {
-                    process.Start();
-
-                    string output = process.StandardOutput.ReadToEnd();
-                    string driverVersion = "Unknown";
-
-                    int versionIndex = output.IndexOf("Driver Version:", StringComparison.OrdinalIgnoreCase);
-                    if (versionIndex >= 0)
-                    {
-                        int endIndex = output.IndexOf(Environment.NewLine, versionIndex);
-                        if (endIndex >= 0)
-                        {
-                            driverVersion = output.Substring(versionIndex + 16, endIndex - versionIndex - 16).Trim();
-
-                            int cudaIndex = driverVersion.IndexOf("CUDA", StringComparison.OrdinalIgnoreCase);
-                            if (cudaIndex >= 0)
-                            {
-                                driverVersion = driverVersion.Substring(0, cudaIndex).Trim();
-                            }
-                        }
-                    }
-
-                    process.WaitForExit();
-                    return $"Driver Version: {driverVersion}";
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error retrieving NVIDIA driver version: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return "Unknown";
-            }
+            SelectElement selectElement = new SelectElement(comboBox);
+            selectElement.SelectByText(optionText);
         }
     }
 }
