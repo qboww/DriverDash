@@ -53,9 +53,11 @@ namespace NvidiaUpdate
             IWebElement searchButton = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
             searchButton.Click();
 
-            IWebElement downloadButton = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
-            string downloadUrl = downloadButton.GetAttribute("href");
-            downloadButton.Click();
+            IWebElement downloadButton1 = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
+            downloadButton1.Click();
+
+            IWebElement downloadButton2 = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
+            downloadButton2.Click();
         }
 
         private void SelectComboBox(IWebDriver driver, string comboBoxName, string optionText)
@@ -68,8 +70,18 @@ namespace NvidiaUpdate
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // Quit the driver and dispose it
             driver.Quit();
             driver.Dispose();
+
+            // Delete the file with ".crdownload" extension
+            string downloadDirectory = "D:\\Downloads";
+            string[] crdownloadFiles = Directory.GetFiles(downloadDirectory, "*.crdownload");
+            foreach (string crdownloadFile in crdownloadFiles)
+            {
+                File.Delete(crdownloadFile);
+            }
         }
+
     }
 }
