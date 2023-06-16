@@ -7,7 +7,6 @@ namespace NvidiaUpdate
     public partial class FormMain : Form
     {
         private IWebDriver driver;
-        private string currentDownloadFilePath;
 
         public FormMain()
         {
@@ -57,21 +56,6 @@ namespace NvidiaUpdate
             IWebElement downloadButton = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
             string downloadUrl = downloadButton.GetAttribute("href");
             downloadButton.Click();
-
-            currentDownloadFilePath = Path.Combine("D:\\Downloads", GetFileNameFromUrl(downloadUrl));
-
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
-            wait.Until(_ => IsFileDownloadComplete(currentDownloadFilePath));
-        }
-
-        private string GetFileNameFromUrl(string url)
-        {
-            return url.Substring(url.LastIndexOf("/") + 1);
-        }
-
-        private bool IsFileDownloadComplete(string filePath)
-        {
-            return File.Exists(filePath + ".crdownload");
         }
 
         private void SelectComboBox(IWebDriver driver, string comboBoxName, string optionText)
@@ -84,21 +68,6 @@ namespace NvidiaUpdate
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!string.IsNullOrEmpty(currentDownloadFilePath))
-            {
-                if (IsFileDownloadComplete(currentDownloadFilePath))
-                {
-                    try
-                    {
-                        File.Delete(currentDownloadFilePath);
-                    }
-                    catch (IOException ex)
-                    {
-                        MessageBox.Show($"Error occurred while deleting the file: {ex.Message}");
-                    }
-                }
-            }
-
             driver.Quit();
             driver.Dispose();
         }
