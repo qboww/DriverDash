@@ -66,7 +66,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(31, 225);
+            button1.Location = new Point(12, 224);
             button1.Name = "button1";
             button1.Size = new Size(64, 28);
             button1.TabIndex = 4;
@@ -101,7 +101,7 @@
             label6.TabIndex = 6;
             label6.Text = "label6";
             // 
-            // Form1
+            // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -113,10 +113,11 @@
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
-            Name = "Form1";
+            Name = "FormMain";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Form1";
-            Load += Form1_Load;
+            FormClosing += FormMain_FormClosing;
+            Load += FormMain_Load;
             ResumeLayout(false);
             PerformLayout();
         }
