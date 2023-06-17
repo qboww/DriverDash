@@ -7,14 +7,13 @@ namespace NvidiaUpdate
 {
     public partial class FormMain : Form
     {
-        private SelectElement? selectElement;
+        private static readonly string repositoryPath = @"D:\Downloads";
+        private List<string> log = new();
+        private Query query = new();
+
         private ChromeDriverService? service;
         private IWebDriver? driver;
         private WebDriverWait wait;
-
-        public static readonly string repositoryPath = @"D:\Downloads";
-        List<string> log = new List<string>();
-        Query query = new();
 
         public FormMain()
         {
@@ -66,7 +65,8 @@ namespace NvidiaUpdate
         }
         #endregion
 
-        public void RunWebDriver()
+        #region Driver Code
+        private void RunWebDriver()
         {
             if (driver != null)
             {
@@ -91,7 +91,6 @@ namespace NvidiaUpdate
                 listBox1.Items.Add("Download is started!\n");
             }
         }
-
         private void SelectComboBox(IWebDriver driver, string comboBoxName, string optionText)
         {
             IWebElement comboBox = wait.Until(ExpectedConditions.ElementIsVisible(By.Id(comboBoxName)));
@@ -101,7 +100,6 @@ namespace NvidiaUpdate
 
             listBox1.Items.Add($"{optionText} is set!");
         }
-
         private void InitializeWebDriver()
         {
             service = ChromeDriverService.CreateDefaultService();
@@ -113,5 +111,6 @@ namespace NvidiaUpdate
 
             driver = new ChromeDriver(service, options);
         }
+        #endregion
     }
 }

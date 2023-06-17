@@ -23,6 +23,7 @@ namespace NvidiaUpdate
             query.Language = language;
         }
 
+        #region System Monitoring
         public static string GetProductType()
         {
             foreach (var gpu in PhysicalGPU.GetPhysicalGPUs())
@@ -185,5 +186,6 @@ namespace NvidiaUpdate
 
             return string.Empty;
         }
+        #endregion
     }
 }
