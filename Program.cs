@@ -1,4 +1,4 @@
-namespace NvidiaUpdate
+namespace DriverDash
 {
     internal static class Program
     {
