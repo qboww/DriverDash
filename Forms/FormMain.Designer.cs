@@ -285,7 +285,7 @@
             labelLatestVersionData.AutoSize = true;
             labelLatestVersionData.Font = new Font("Segoe UI Variable Small Semibol", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             labelLatestVersionData.ForeColor = Color.White;
-            labelLatestVersionData.Location = new Point(82, 56);
+            labelLatestVersionData.Location = new Point(93, 56);
             labelLatestVersionData.Name = "labelLatestVersionData";
             labelLatestVersionData.Size = new Size(81, 20);
             labelLatestVersionData.TabIndex = 19;
@@ -319,7 +319,7 @@
             labelTypeData.AutoSize = true;
             labelTypeData.Font = new Font("Segoe UI Variable Small Semibol", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             labelTypeData.ForeColor = Color.White;
-            labelTypeData.Location = new Point(71, 56);
+            labelTypeData.Location = new Point(108, 56);
             labelTypeData.Name = "labelTypeData";
             labelTypeData.Size = new Size(81, 20);
             labelTypeData.TabIndex = 23;
@@ -344,7 +344,7 @@
             labelSeriesData.AutoSize = true;
             labelSeriesData.Font = new Font("Segoe UI Variable Small Semibol", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             labelSeriesData.ForeColor = Color.White;
-            labelSeriesData.Location = new Point(80, 86);
+            labelSeriesData.Location = new Point(108, 86);
             labelSeriesData.Name = "labelSeriesData";
             labelSeriesData.Size = new Size(81, 20);
             labelSeriesData.TabIndex = 25;
@@ -369,7 +369,7 @@
             labelProductData.AutoSize = true;
             labelProductData.Font = new Font("Segoe UI Variable Small Semibol", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             labelProductData.ForeColor = Color.White;
-            labelProductData.Location = new Point(94, 116);
+            labelProductData.Location = new Point(108, 116);
             labelProductData.Name = "labelProductData";
             labelProductData.Size = new Size(81, 20);
             labelProductData.TabIndex = 27;
@@ -394,7 +394,7 @@
             labelOSData.AutoSize = true;
             labelOSData.Font = new Font("Segoe UI Variable Small Semibol", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             labelOSData.ForeColor = Color.White;
-            labelOSData.Location = new Point(58, 146);
+            labelOSData.Location = new Point(108, 144);
             labelOSData.Name = "labelOSData";
             labelOSData.Size = new Size(81, 20);
             labelOSData.TabIndex = 29;
@@ -444,7 +444,7 @@
             labelLanguageData.AutoSize = true;
             labelLanguageData.Font = new Font("Segoe UI Variable Small Semibol", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             labelLanguageData.ForeColor = Color.White;
-            labelLanguageData.Location = new Point(107, 206);
+            labelLanguageData.Location = new Point(108, 206);
             labelLanguageData.Name = "labelLanguageData";
             labelLanguageData.Size = new Size(81, 20);
             labelLanguageData.TabIndex = 33;
@@ -493,7 +493,7 @@
             labelStateData.AutoSize = true;
             labelStateData.Font = new Font("Segoe UI Variable Small Semibol", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             labelStateData.ForeColor = Color.White;
-            labelStateData.Location = new Point(83, 57);
+            labelStateData.Location = new Point(86, 57);
             labelStateData.Name = "labelStateData";
             labelStateData.Size = new Size(15, 20);
             labelStateData.TabIndex = 36;
@@ -504,7 +504,7 @@
             labelTotalData.AutoSize = true;
             labelTotalData.Font = new Font("Segoe UI Variable Small Semibol", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             labelTotalData.ForeColor = Color.White;
-            labelTotalData.Location = new Point(73, 86);
+            labelTotalData.Location = new Point(86, 86);
             labelTotalData.Name = "labelTotalData";
             labelTotalData.Size = new Size(15, 20);
             labelTotalData.TabIndex = 37;

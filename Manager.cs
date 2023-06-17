@@ -2,7 +2,6 @@
 using Microsoft.Win32;
 using NvAPIWrapper;
 using NvAPIWrapper.GPU;
-using System.Net;
 using System.Text.RegularExpressions;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
