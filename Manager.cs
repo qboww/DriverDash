@@ -87,8 +87,7 @@ namespace NvidiaUpdate
             string version = GetWindowsVersion();
             string architecture = GetWindowsArchitecture();
 
-            //return version + " " + architecture;
-            return version;
+            return version + " " + architecture;
         }
 
         public static string GetCurrentDriverVersion()
@@ -120,11 +119,12 @@ namespace NvidiaUpdate
         public static string GetWindowsVersion()
         {
             string key = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
-            using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(key))
+            using (RegistryKey? registryKey = Registry.LocalMachine.OpenSubKey(key))
             {
                 if (registryKey != null)
                 {
-                    string productName = registryKey.GetValue("ProductName") as string;
+                    string? productName = registryKey.GetValue("ProductName") as string;
+
                     if (!string.IsNullOrEmpty(productName))
                     {
                         return RemoveModificationWords(productName.Trim());
@@ -137,8 +137,14 @@ namespace NvidiaUpdate
 
         public static string GetWindowsArchitecture()
         {
-            string environmentVariable = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
-            return environmentVariable.Contains("64") ? "64-bit" : "32-bit";
+            string? environmentVariable = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+
+            if (environmentVariable != null)
+            {
+                return environmentVariable.Contains("64") ? "64-bit" : "32-bit";
+            }
+
+            return "Unknown";
         }
 
         public static string RemoveModificationWords(string productName)

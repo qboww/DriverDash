@@ -1,30 +1,31 @@
-﻿using HtmlAgilityPack;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
-using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace NvidiaUpdate
 {
     public partial class FormMain : Form
     {
-        private ChromeDriverService service;
-        private IWebDriver driver;
-        
-        public static string? repositoryPath = @"D:\Downloads";
+        private SelectElement? selectElement;
+        private ChromeDriverService? service;
+        private IWebDriver? driver;
+        private WebDriverWait wait;
+
+        public static readonly string repositoryPath = @"D:\Downloads";
         List<string> log = new List<string>();
         Query query = new();
 
         public FormMain()
         {
             InitializeComponent();
+            InitializeWebDriver();
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
         }
 
         #region Events
         private void FormMain_Load(object sender, EventArgs e)
         {
-            string text = string.Empty;
             string versionNumber = Manager.GetLatestDriverVersion();
 
             log.Add($"Current version: {Manager.GetCurrentDriverVersion()}\n");
@@ -43,12 +44,22 @@ namespace NvidiaUpdate
 
             listBox1.Items.AddRange(log.ToArray());
         }
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            driver?.Quit();
+            driver?.Dispose();
+            service?.Dispose();
 
+            string[] crdownloadFiles = Directory.GetFiles(repositoryPath, "*.crdownload");
+            foreach (string crdownloadFile in crdownloadFiles)
+            {
+                File.Delete(crdownloadFile);
+            }
+        }
         private void button1_Click(object sender, EventArgs e)
         {
             RunWebDriver();
         }
-
         private void button2_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("explorer.exe", repositoryPath);
@@ -59,100 +70,48 @@ namespace NvidiaUpdate
         {
             if (driver != null)
             {
-                driver.Quit();
-                driver.Dispose();
+                driver.Navigate().GoToUrl("https://www.nvidia.com/Download/index.aspx?lang=en-us");
+
+                SelectComboBox(driver, "selProductSeriesType", $"{query.ProductType}");
+                SelectComboBox(driver, "selProductSeries", $"{query.ProductSeries}");
+                SelectComboBox(driver, "selProductFamily", $"{query.Product}");
+                SelectComboBox(driver, "selOperatingSystem", $"{query.OperatingSystem}");
+                SelectComboBox(driver, "ddlDownloadTypeCrdGrd", $"{query.DownloadType}");
+                SelectComboBox(driver, "ddlLanguage", $"{query.Language}");
+
+                listBox1.Items.Add("\n");
+
+                IWebElement searchButton = wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("btn_drvr_lnk_txt")));
+                searchButton.Click();
+                IWebElement downloadButton1 = wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("btn_drvr_lnk_txt")));
+                downloadButton1.Click();
+                IWebElement downloadButton2 = wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("btn_drvr_lnk_txt")));
+                downloadButton2.Click();
+
+                listBox1.Items.Add("Download is started!\n");
             }
-
-            ChromeDriverService service = ChromeDriverService.CreateDefaultService();
-            service.HideCommandPromptWindow = true;
-            
-            ChromeOptions options = new ChromeOptions();
-            options.AddArgument("--headless");
-            options.AddUserProfilePreference("download.default_directory", "D:\\Downloads");
-
-            driver = new ChromeDriver(service, options);
-            this.TopMost = true;
-            driver.Navigate().GoToUrl("https://www.nvidia.com/Download/index.aspx?lang=en-us");
-
-            SelectComboBox(driver, "selProductSeriesType", $"{query.ProductType}");
-            SelectComboBox(driver, "selProductSeries", $"{query.ProductSeries}");
-            SelectComboBox(driver, "selProductFamily", $"{query.Product}");
-            SelectComboBox(driver, "selOperatingSystem", $"{query.OperatingSystem}");
-            SelectComboBox(driver, "ddlDownloadTypeCrdGrd", $"{query.DownloadType}");
-            SelectComboBox(driver, "ddlLanguage", $"{query.Language}");
-
-            IWebElement searchButton = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
-            searchButton.Click();
-
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("btn_drvr_lnk_txt")));
-
-            IWebElement downloadButton1 = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
-            downloadButton1.Click();
-
-            Thread.Sleep(1000);
-
-            IWebElement downloadButton2 = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
-            downloadButton2.Click();
-            listBox1.Items.Add("Download is started!\n");
         }
 
         private void SelectComboBox(IWebDriver driver, string comboBoxName, string optionText)
         {
-            IWebElement comboBox = driver.FindElement(By.Name(comboBoxName));
-
+            IWebElement comboBox = wait.Until(ExpectedConditions.ElementIsVisible(By.Id(comboBoxName)));
             SelectElement selectElement = new SelectElement(comboBox);
-            IList<IWebElement> options = selectElement.Options;
 
-            foreach (IWebElement option in options)
-            {
-                if (option.Text.Contains(optionText))
-                {
-                    option.Click();
-                    break;
-                }
-            }
+            selectElement.SelectByText(optionText);
+
+            listBox1.Items.Add($"{optionText} is set!");
         }
 
-        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        private void InitializeWebDriver()
         {
-            if (driver != null)
-            {
-                driver.Quit();
-                driver.Dispose();
-            }
-            if (service != null)
-            {
-                service.Dispose();
-            }
+            service = ChromeDriverService.CreateDefaultService();
+            service.HideCommandPromptWindow = true;
 
-            string downloadDirectory = "D:\\Downloads";
-            string[] crdownloadFiles = Directory.GetFiles(downloadDirectory, "*.crdownload");
-            foreach (string crdownloadFile in crdownloadFiles)
-            {
-                File.Delete(crdownloadFile);
-            }
-        }
+            ChromeOptions options = new ChromeOptions();
+            options.AddArgument("--headless");
+            options.AddUserProfilePreference("download.default_directory", repositoryPath);
 
-        public void SelectComboBoxItemByKeyword(string comboBoxId, string keyword)
-        {
-            HtmlWeb web = new HtmlWeb();
-            HtmlDocument doc = web.Load("https://www.nvidia.com/download/index.aspx?lang=en-us");
-
-            HtmlNode selectNode = doc.DocumentNode.SelectSingleNode($"//select[@id='{comboBoxId}']");
-            if (selectNode == null)
-            {
-                return;
-            }
-
-            HtmlNode option = selectNode.Descendants("option").FirstOrDefault(opt => opt.InnerText.Contains(keyword));
-            if (option == null)
-            {
-                return;
-            }
-
-            option.SetAttributeValue("selected", "selected");
-            log.Add($"{keyword} - Done!\n");
+            driver = new ChromeDriver(service, options);
         }
     }
 }

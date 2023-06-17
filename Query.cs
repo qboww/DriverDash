@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace NvidiaUpdate
+﻿namespace NvidiaUpdate
 {
     public class Query
     {
@@ -14,16 +12,6 @@ namespace NvidiaUpdate
         public Query()
         {
             Manager.SystemMonitoring(this);
-        }
-
-        private bool GetType()
-        {
-            if (ProductSeries.Contains("Notebooks"))
-            {
-                return true;
-            }
-
-            return false;
         }
     }
 }
