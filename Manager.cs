@@ -1,7 +1,10 @@
-﻿using Microsoft.Win32;
+﻿using HtmlAgilityPack;
+using Microsoft.Win32;
 using NvAPIWrapper;
 using NvAPIWrapper.GPU;
 using System.Text.RegularExpressions;
+using HtmlDocument = HtmlAgilityPack.HtmlDocument;
+
 
 namespace NvidiaUpdate
 {
@@ -84,7 +87,8 @@ namespace NvidiaUpdate
             string version = GetWindowsVersion();
             string architecture = GetWindowsArchitecture();
 
-            return version + " " + architecture;
+            //return version + " " + architecture;
+            return version;
         }
 
         public static string GetCurrentDriverVersion()
@@ -146,6 +150,34 @@ namespace NvidiaUpdate
             }
 
             return productName;
+        }
+
+        public static string GetLatestDriverVersion()
+        {
+            string url = "https://www.techpowerup.com/download/nvidia-geforce-graphics-drivers/";
+
+            HtmlWeb web = new HtmlWeb();
+            HtmlDocument document = web.Load(url);
+
+            HtmlNode driverNode = document.DocumentNode.SelectSingleNode("//a[@class='s--drivers__driver s--drivers__driver--nvidia']");
+            string versionText = driverNode.InnerHtml;
+
+            string versionNumber = ExtractVersionNumber(versionText);
+
+            return versionNumber;
+        }
+
+        public static string ExtractVersionNumber(string versionText)
+        {
+            int startIndex = versionText.IndexOf("NVIDIA GeForce") + "NVIDIA GeForce".Length;
+            int endIndex = versionText.IndexOf(" WHQL");
+
+            if (startIndex >= 0 && endIndex > startIndex)
+            {
+                return versionText.Substring(startIndex, endIndex - startIndex).Trim();
+            }
+
+            return string.Empty;
         }
     }
 }
