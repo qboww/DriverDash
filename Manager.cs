@@ -5,7 +5,6 @@ using NvAPIWrapper.GPU;
 using System.Text.RegularExpressions;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
-
 namespace DriverDash
 {
     public static class Manager
@@ -173,19 +172,7 @@ namespace DriverDash
 
             return versionNumber;
         }
-        public static string GetDriverSize()
-        {
-            string url = "https://www.techpowerup.com/download/nvidia-geforce-graphics-drivers/";
-
-            HtmlWeb web = new HtmlWeb();
-            HtmlDocument document = web.Load(url);
-
-            HtmlNode fileSizeNode = document.DocumentNode.SelectSingleNode("//div[@class='filesize']");
-            string fileSizeText = fileSizeNode.InnerText.Trim();
-
-            return fileSizeText;
-        }
-
+        
         public static string ExtractVersionNumber(string versionText)
         {
             int startIndex = versionText.IndexOf("NVIDIA GeForce") + "NVIDIA GeForce".Length;

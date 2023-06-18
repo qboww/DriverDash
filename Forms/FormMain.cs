@@ -1,13 +1,15 @@
-﻿using OpenQA.Selenium;
+﻿using HtmlAgilityPack;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
+using System.Collections.ObjectModel;
 using System.Text.Json;
+using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace DriverDash
 {
     public partial class FormMain : Form
     {
-        private string updateSize = Manager.GetDriverSize().ToString().Replace(".", ",");
+        private string updateSize = GetDriverSize().ToString().Replace(".", ",");
         public static string filePath = @"..\..\..\path.json";
         private Query query = new();
 
@@ -103,6 +105,9 @@ namespace DriverDash
                     labelStateData.ForeColor = Color.FromKnownColor(KnownColor.Control);
                     labelStateData.Text = "Downloaded";
                     labelStateData.ForeColor = Color.LimeGreen;
+
+                    Thread.Sleep(2000);
+                    OpenDownloadedFile(crdownloadFilePath);
                 }
             }
         }
@@ -145,6 +150,29 @@ namespace DriverDash
         #endregion
 
         #region OtherFuncs
+        private void OpenDownloadedFile(string filePath)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(filePath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error opening file: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        public static string GetDriverSize()
+        {
+            string url = "https://www.techpowerup.com/download/nvidia-geforce-graphics-drivers/";
+
+            HtmlWeb web = new HtmlWeb();
+            HtmlDocument document = web.Load(url);
+
+            HtmlNode fileSizeNode = document.DocumentNode.SelectSingleNode("//div[@class='filesize']");
+            string fileSizeText = fileSizeNode.InnerText.Trim();
+
+            return fileSizeText;
+        }
         private string GetCrdownloadFilePath()
         {
             string[] crdownloadFiles = Directory.GetFiles(downloadPath, "*.crdownload");
@@ -196,33 +224,22 @@ namespace DriverDash
         {
             if (driver != null)
             {
-                driver.Navigate().GoToUrl("https://www.nvidia.com/Download/index.aspx?lang=en-us");
+                driver.Navigate().GoToUrl("https://www.techpowerup.com/download/nvidia-geforce-graphics-drivers/");
 
-                SelectComboBox(driver, "selProductSeriesType", $"{query.ProductType}");
-                SelectComboBox(driver, "selProductSeries", $"{query.ProductSeries}");
-                SelectComboBox(driver, "selProductFamily", $"{query.Product}");
-                SelectComboBox(driver, "selOperatingSystem", $"{query.OperatingSystem}");
-                SelectComboBox(driver, "ddlDownloadTypeCrdGrd", $"{query.DownloadType}");
-                SelectComboBox(driver, "ddlLanguage", $"{query.Language}");
+                ReadOnlyCollection<IWebElement> downloadButtons = driver.FindElements(By.CssSelector("input.button.startbutton[value='Download']"));
 
-                IWebElement searchButton = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
-                searchButton.Click();
-                IWebElement downloadButton1 = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
-                downloadButton1.Click();
-                IWebElement downloadButton2 = driver.FindElement(By.ClassName("btn_drvr_lnk_txt"));
-                downloadButton2.Click();
+                if (downloadButtons.Count > 0)
+                {
+                    downloadButtons[0].Click();
 
-                labelStateData.ForeColor = Color.FromKnownColor(KnownColor.Control);
-                labelStateData.Text = "Downloading";
-                labelStateData.ForeColor = Color.Cyan;
+                    IWebElement serverButton = driver.FindElement(By.XPath("//button[@type='submit' and @name='server_id' and @value='5']"));
+                    serverButton.Click();
+
+                    labelStateData.ForeColor = Color.FromKnownColor(KnownColor.Control);
+                    labelStateData.Text = "Downloading";
+                    labelStateData.ForeColor = Color.Cyan;
+                }
             }
-        }
-        private void SelectComboBox(IWebDriver driver, string comboBoxName, string optionText)
-        {
-            IWebElement comboBox = driver.FindElement(By.Id(comboBoxName));
-            SelectElement selectElement = new SelectElement(comboBox);
-
-            selectElement.SelectByText(optionText);
         }
         private void InitializeWebDriver()
         {
@@ -230,7 +247,7 @@ namespace DriverDash
             service.HideCommandPromptWindow = true;
 
             ChromeOptions options = new ChromeOptions();
-            options.AddArgument("--headless");
+            options.AddArgument($"--window-position=-32000,-32000");
             options.AddUserProfilePreference("download.default_directory", downloadPath);
 
             driver = new ChromeDriver(service, options);
